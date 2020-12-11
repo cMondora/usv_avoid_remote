@@ -17,10 +17,8 @@ class Model(object):
     __init__:
     - Creates the step_model
     - Creates the train_model
-
     train():
     - Make the training part (feedforward and retropropagation of gradients)
-
     save/load():
     - Save load the model
     """
@@ -46,13 +44,11 @@ class Model(object):
         self.A = A = train_model.pdtype.sample_placeholder([None])
         self.ADV = ADV = tf.placeholder(tf.float32, [None])
         self.R = R = tf.placeholder(tf.float32, [None])
-        self.dense_reward = tf.placeholder(tf.float32, [None])
         # Keep track of old actor
         self.OLDNEGLOGPAC = OLDNEGLOGPAC = tf.placeholder(tf.float32, [None])
         # Keep track of old critic
         self.OLDVPRED = OLDVPRED = tf.placeholder(tf.float32, [None])
         self.LR = LR = tf.placeholder(tf.float32, [])
-        self.BETA = BETA = tf.placeholder(tf.float32, [])
         # Cliprange
         self.CLIPRANGE = CLIPRANGE = tf.placeholder(tf.float32, [])
 
@@ -122,7 +118,6 @@ class Model(object):
         self.act_model = act_model
         self.step = act_model.step
         self.value = act_model.value
-        self.dense_value = act_model.dense_value
         self.initial_state = act_model.initial_state
 
         self.save = functools.partial(save_variables, sess=sess)
@@ -133,24 +128,20 @@ class Model(object):
         if MPI is not None:
             sync_from_root(sess, global_variables, comm=comm) #pylint: disable=E1101
 
-    def train(self, lr, beta, cliprange, obs, returns, dense_return, masks, actions, values, dense_values, neglogpacs, states=None):
+    def train(self, lr, cliprange, obs, returns, masks, actions, values, neglogpacs, states=None):
         # Here we calculate advantage A(s,a) = R + yV(s') - V(s)
         # Returns = R + yV(s')
         advs = returns - values
-        dense_advs = dense_return - dense_values
 
         # Normalize the advantages
         advs = (advs - advs.mean()) / (advs.std() + 1e-8)
-        dense_advs = (dense_advs - dense_advs.mean()) / (dense_advs.std() + 1e-8)
 
         td_map = {
             self.train_model.X : obs,
             self.A : actions,
             self.ADV : advs,
             self.R : returns,
-            self.dense_reward: dense_return,
             self.LR : lr,
-            self.BETA : beta,
             self.CLIPRANGE : cliprange,
             self.OLDNEGLOGPAC : neglogpacs,
             self.OLDVPRED : values
@@ -163,4 +154,3 @@ class Model(object):
             self.stats_list + [self._train_op],
             td_map
         )[:-1]
-
