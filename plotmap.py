@@ -22,11 +22,11 @@ RAD2DEG = 57.29577951308232     # 弧度与角度换算关系1弧度=57.29..角�
 # random small circle-----------
 
 # Big circle one empty-----------
-BIG_RAD = 16
+BIG_RAD = 14
 OBSTACLE_POS = []
 for a in range(10):
     OBSTACLE_POS.append([50 + BIG_RAD * math.cos(math.pi / 6 * a), 50 + BIG_RAD * math.sin(math.pi / 6 * a)])
-    OBSTACLE_RADIUS = [2.5 for a in range(10)]
+OBSTACLE_RADIUS = [2.5 for a in range(10)]
 # Big circle one empty-----------
 
 # narrow-----------
