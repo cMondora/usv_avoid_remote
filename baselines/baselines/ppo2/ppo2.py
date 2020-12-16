@@ -118,7 +118,7 @@ def learn(*, network, env, total_timesteps, eval_env = None, seed=None, nsteps=2
 
         # Get minibatch
         if update % 100 == 0:
-            decrie = decrie * 0.999
+            decrie = decrie * 0.99
         obs, returns, masks, actions, values, neglogpacs, states, epinfos = runner.run(decrie) #pylint: disable=E0632
         if eval_env is not None:
             eval_obs, eval_returns, eval_masks, eval_actions, eval_values, eval_neglogpacs, eval_states, eval_epinfos = eval_runner.run() #pylint: disable=E0632
