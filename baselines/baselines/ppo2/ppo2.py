@@ -19,7 +19,7 @@ def constfn(val):
     return f
 
 def learn(*, network, env, total_timesteps, eval_env = None, seed=None, nsteps=2048, ent_coef=0.0, lr=3e-4,
-            vf_coef=0.5,  max_grad_norm=0.5, gamma=0.99, lam=0.95,
+            vf_coef=0.5,  max_grad_norm=0.5, gamma=0.99, lam=0.95, decrie=8e-4,
             log_interval=10, nminibatches=4, noptepochs=4, cliprange=0.2,
             save_interval=0, load_path=None, model_fn=None, update_fn=None, init_fn=None, mpi_rank_weight=1, comm=None, **network_kwargs):
     '''
@@ -117,7 +117,9 @@ def learn(*, network, env, total_timesteps, eval_env = None, seed=None, nsteps=2
         if update % log_interval == 0 and is_mpi_root: logger.info('Stepping environment...')
 
         # Get minibatch
-        obs, returns, masks, actions, values, neglogpacs, states, epinfos = runner.run() #pylint: disable=E0632
+        if update % 100 == 0:
+            decrie = decrie * 0.999
+        obs, returns, masks, actions, values, neglogpacs, states, epinfos = runner.run(decrie) #pylint: disable=E0632
         if eval_env is not None:
             eval_obs, eval_returns, eval_masks, eval_actions, eval_values, eval_neglogpacs, eval_states, eval_epinfos = eval_runner.run() #pylint: disable=E0632
 

@@ -16,7 +16,8 @@ class Runner(AbstractEnvRunner):
         # Discount rate
         self.gamma = gamma
 
-    def run(self):
+
+    def run(self, decrie):
         # Here, we init the lists that will contain the mb of experiences
         mb_obs, mb_rewards, mb_actions, mb_values, mb_dones, mb_neglogpacs = [],[],[],[],[],[]
         mb_states = self.states
@@ -34,7 +35,8 @@ class Runner(AbstractEnvRunner):
 
             # Take actions in env and look the results
             # Infos contains a ton of useful informations
-            self.obs[:], rewards, self.dones, infos = self.env.step(actions)
+            self.obs[:], r, self.dones, infos = self.env.step(actions)
+            rewards = r + decrie * infos[2]
             for info in infos:
                 maybeepinfo = info.get('episode')
                 if maybeepinfo: epinfos.append(maybeepinfo)
