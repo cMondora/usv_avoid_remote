@@ -117,7 +117,7 @@ def learn(*, network, env, total_timesteps, eval_env = None, seed=None, nsteps=2
         if update % log_interval == 0 and is_mpi_root: logger.info('Stepping environment...')
 
         # Get minibatch
-        if update % 1000 == 0:
+        if update % 10000 == 0:
             decrie = decrie * 0.99
         obs, returns, masks, actions, values, neglogpacs, states, epinfos = runner.run(decrie) #pylint: disable=E0632
         if eval_env is not None:
